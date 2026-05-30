@@ -1,0 +1,1 @@
+def create_entry_event(track_id):
