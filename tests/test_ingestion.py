@@ -1,3 +1,14 @@
+# PROMPT:
+# Generate a FastAPI test for an event ingestion endpoint using pytest and TestClient.
+# Verify successful ingestion of a valid event payload.
+
+# CHANGES MADE:
+# Updated payload fields to match the Store Intelligence event schema.
+# Modified endpoint path to use /events/ingest.
+# Added assertions compatible with the project's ingestion response.
+
+
+
 from fastapi.testclient import TestClient
 from app.main import app
 

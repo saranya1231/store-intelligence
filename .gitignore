@@ -6,3 +6,7 @@ runs/
 .pytest_cache/
 .vscode/
 .idea/
+
+yolov8n.pt
+bus.jpg
+sample_data/
