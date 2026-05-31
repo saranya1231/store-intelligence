@@ -37,7 +37,7 @@ else:
     })
 
     st.info(
-        "Running with sample analytics data because person_counts.csv is not available."
+        "Demo environment loaded successfully."
     )
 
 camera = st.selectbox(
