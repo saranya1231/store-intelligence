@@ -2,9 +2,9 @@
 
 ## Overview
 
-The Store Intelligence Platform processes retail store events generated from CCTV analytics and provides actionable business insights through REST APIs.
+The Store Intelligence Platform processes retail store events generated from CCTV analytics and provides actionable business insights through REST APIs and visual dashboards.
 
-The system combines computer vision, event processing, analytics, and anomaly detection to help retailers understand visitor behavior and store performance.
+The system combines computer vision, event processing, analytics, anomaly detection, and dashboard visualization to help retailers understand visitor behavior and store performance.
 
 ---
 
@@ -28,8 +28,17 @@ The system combines computer vision, event processing, analytics, and anomaly de
 ### Computer Vision
 
 * YOLOv8 Person Detection
-* Event Generation Pipeline
+* CCTV Video Processing
+* Person Counting Analytics
+* CSV Analytics Export
 * Future support for Multi-Object Tracking
+
+### Dashboard
+
+* Streamlit Dashboard
+* Peak Occupancy Analytics
+* Average Occupancy Analytics
+* Camera-wise Person Count Trends
 
 ### Deployment
 
@@ -41,65 +50,42 @@ The system combines computer vision, event processing, analytics, and anomaly de
 
 ## Project Structure
 
+```text
 store-intelligence/
 
 ├── app/
-
-│ ├── main.py
-
-│ ├── database.py
-
-│ ├── models.py
-
-│ ├── schemas.py
-
-│ ├── ingestion.py
-
-│ ├── metrics.py
-
-│ ├── funnel.py
-
-│ ├── heatmap.py
-
-│ └── anomalies.py
-
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── ingestion.py
+│   ├── metrics.py
+│   ├── funnel.py
+│   ├── heatmap.py
+│   └── anomalies.py
 │
-
 ├── pipeline/
-
-│ ├── detect.py
-
-│ ├── tracker.py
-
-│ └── emit.py
-
+│   ├── detect.py
+│   ├── tracker.py
+│   ├── emit.py
+│   ├── event_generator.py
+│   └── video_detector.py
 │
-
 ├── docs/
-
-│ ├── README.md
-
-│ ├── DESIGN.md
-
-│ └── CHOICES.md
-
+│   ├── DESIGN.md
+│   └── CHOICES.md
 │
-
 ├── tests/
-
 ├── data/
-
 ├── database/
-
 ├── logs/
-
+│
+├── dashboard.py
 ├── Dockerfile
-
 ├── docker-compose.yml
-
 ├── requirements.txt
-
 └── README.md
+```
 
 ---
 
@@ -169,6 +155,51 @@ http://localhost:8000/docs
 
 ---
 
+## Run CCTV Video Analytics
+
+Process CCTV videos and generate person-count analytics:
+
+```bash
+python pipeline/video_detector.py
+```
+
+Output:
+
+```text
+person_counts.csv
+```
+
+The CSV contains:
+
+* Camera Name
+* Frame Number
+* Person Count
+
+---
+
+## Run Dashboard
+
+Start the Streamlit dashboard:
+
+```bash
+streamlit run dashboard.py
+```
+
+Dashboard URL:
+
+```text
+http://localhost:8501
+```
+
+Dashboard Features:
+
+* Camera Selection
+* Peak Occupancy
+* Average Occupancy
+* Person Count Trend Graph
+
+---
+
 ## Available APIs
 
 ### POST /events/ingest
@@ -221,6 +252,30 @@ Returns application health status.
 * YOLOv8
 * OpenCV
 * Ultralytics
+* Streamlit
+* Pandas
+
+---
+
+## Testing
+
+Run all tests:
+
+```bash
+pytest
+```
+
+Current Status:
+
+* Health API Tests Passed
+* Ingestion API Tests Passed
+* Metrics API Tests Passed
+
+Coverage:
+
+```text
+82%
+```
 
 ---
 
@@ -228,7 +283,16 @@ Returns application health status.
 
 * ByteTrack Integration
 * Multi-Camera Tracking
-* PostgreSQL Support
-* Real-Time Analytics
-* Dashboard Visualization
+* Real-Time Event Streaming
+* PostgreSQL Migration
 * Advanced Anomaly Detection
+* Live Retail Dashboard
+* Multi-Store Analytics
+
+---
+
+## AI-Assisted Development
+
+AI tools were used to accelerate development, generate initial code structures, create test templates, assist with Docker setup, and draft documentation.
+
+All generated code was reviewed, modified, tested, and integrated manually into the final solution.
