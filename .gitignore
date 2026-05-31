@@ -10,3 +10,7 @@ runs/
 yolov8n.pt
 bus.jpg
 sample_data/
+
+data/
+*.mp4
+person_counts.csv
