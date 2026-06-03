@@ -2,102 +2,58 @@
 
 ## Overview
 
-The Store Intelligence Platform processes retail store events generated from CCTV video analytics and provides business insights through REST APIs. The system captures visitor movements, dwell time, zone interactions, queue behavior, and purchase funnel metrics.
+The Store Intelligence Platform converts CCTV video observations into actionable retail intelligence. The system processes visitor activity, generates structured events, stores them in a centralized repository, computes analytics, and exposes business insights through REST APIs and a live dashboard.
 
-The platform combines computer vision, event processing, analytics, and reporting capabilities to help retailers understand customer behavior and improve operational efficiency.
+The primary business objective is to help retailers understand customer behavior, identify operational issues, and improve store conversion rates.
 
-## Architecture
+---
 
-### Components
+# System Architecture
 
-### 1. Computer Vision Pipeline
+The platform follows a modular event-driven architecture consisting of four major layers:
 
-The computer vision layer is responsible for detecting people from images and video streams.
+1. Detection Layer
+2. Event Processing Layer
+3. Intelligence API Layer
+4. Dashboard Layer
 
-Features:
-
-* YOLOv8-based object detection
-* Person detection from CCTV feeds
-* Event generation from detections
-* Future support for multi-object tracking
-
-### 2. Event Ingestion API
-
-The ingestion layer receives events generated from the detection pipeline.
-
-Features:
-
-* FastAPI-based REST service
-* Batch event ingestion
-* Event validation
-* Duplicate event detection
-* Idempotent processing
-
-### 3. Data Storage Layer
-
-The storage layer persists events and supports analytics queries.
-
-Features:
-
-* SQLite database
-* Event persistence
-* Aggregated metric calculations
-* Lightweight deployment
-
-### 4. Intelligence APIs
-
-The analytics layer exposes business intelligence metrics.
-
-Features:
-
-* Store Metrics API
-* Conversion Funnel API
-* Heatmap Analytics API
-* Anomaly Detection API
-* Health Monitoring API
-
-## Event Flow
-
-The platform follows an event-driven architecture.
+## High-Level Flow
 
 Video/Image Input
 
-→ YOLOv8 Detection
+→ Detection Pipeline
 
-→ Event Generation
+→ Structured Events
 
-→ POST /events/ingest
+→ Event Ingestion API
 
 → SQLite Storage
 
-→ Analytics APIs
+→ Analytics Engine
 
-→ Business Insights
+→ REST APIs
 
-This design separates detection from analytics, making the platform easier to scale and maintain.
+→ Live Dashboard
 
-## Database Design
+This separation ensures that detection logic remains independent from analytics and reporting components.
 
-### Events Table
+---
 
-The Events table stores all visitor activity within the store.
+# Component Design
 
-Attributes include:
+## 1. Detection Pipeline
 
-* Event ID
-* Store ID
-* Camera ID
-* Visitor ID
-* Event Type
-* Timestamp
-* Zone ID
-* Dwell Time
-* Staff Flag
-* Confidence Score
+The detection layer is responsible for identifying customers from CCTV footage and generating business events.
 
-### Event Types
+Responsibilities:
 
-Supported event types:
+* Person detection using YOLOv8
+* Detection confidence evaluation
+* Event creation
+* Visitor activity tracking
+* Structured event generation
+
+Output events include:
 
 * ENTRY
 * EXIT
@@ -105,26 +61,66 @@ Supported event types:
 * BILLING_QUEUE_JOIN
 * PURCHASE
 
-These event types are used to calculate visitor behavior metrics and conversion funnel analytics.
+The detection layer acts as the producer in the event-driven architecture.
 
-## Analytics Layer
+---
+
+## 2. Event Ingestion API
+
+The ingestion service receives events from the detection pipeline.
+
+Responsibilities:
+
+* Event validation
+* Schema enforcement
+* Duplicate detection
+* Idempotent ingestion
+* Event persistence
+
+The API accepts event batches and stores validated records in the database.
+
+---
+
+## 3. Storage Layer
+
+SQLite is used as the persistence layer.
+
+Responsibilities:
+
+* Store event records
+* Support analytics queries
+* Maintain visitor activity history
+* Enable reporting APIs
+
+SQLite was selected because it requires no additional infrastructure and simplifies reviewer setup.
+
+---
+
+## 4. Intelligence API Layer
+
+The intelligence layer transforms raw events into business metrics.
+
+Supported APIs:
 
 ### Metrics API
 
 Provides:
 
-* Unique visitor count
+* Unique visitors
 * Average dwell time
-* Store-level engagement metrics
+* Store engagement metrics
 
 ### Funnel API
 
-Tracks visitor progression through the retail journey:
+Tracks visitor progression:
 
-* Entry count
-* Zone visits
-* Billing queue visits
-* Purchases
+ENTRY → ZONE_VISIT → BILLING_QUEUE → PURCHASE
+
+Provides:
+
+* Funnel counts
+* Conversion rates
+* Drop-off percentages
 
 ### Heatmap API
 
@@ -139,66 +135,146 @@ Provides:
 Detects:
 
 * Queue spikes
-* Low conversion scenarios
-* Operational anomalies
+* Conversion drops
+* Operational abnormalities
 
-## Deployment
+### Health API
 
-The application is containerized using Docker.
+Provides:
 
-Run:
+* Service availability
+* Basic platform diagnostics
 
-docker compose up
+---
 
-After startup, APIs are available through:
+# Database Design
 
-* Application URL: http://localhost:8000
-* Swagger UI: http://localhost:8000/docs
-* OpenAPI Specification: http://localhost:8000/openapi.json
+## Events Table
 
-## Testing Strategy
+Stores all visitor activity.
 
-The project includes automated testing using Pytest.
+Attributes:
 
-Test Coverage Includes:
+* Event ID
+* Store ID
+* Camera ID
+* Visitor ID
+* Event Type
+* Timestamp
+* Zone ID
+* Dwell Time
+* Confidence Score
+* Staff Flag
 
-* Health endpoint validation
-* Event ingestion testing
-* Metrics API validation
+This structure enables downstream analytics without requiring access to raw video.
 
-Current coverage exceeds the minimum project requirement and helps ensure application stability.
+---
 
-## Future Enhancements
+# Event Flow
 
-Planned improvements include:
+1. CCTV footage is processed by the detection pipeline.
+2. Person detections are converted into business events.
+3. Events are submitted to the ingestion API.
+4. Events are validated and stored.
+5. Analytics services compute business metrics.
+6. REST APIs expose results.
+7. Dashboard visualizes store performance.
+
+---
+
+# Testing Strategy
+
+Automated testing was implemented using Pytest.
+
+Coverage includes:
+
+* Health endpoint testing
+* Event ingestion validation
+* Metrics endpoint verification
+* API response validation
+
+Testing helps ensure reliability and maintainability of the platform.
+
+---
+
+# AI-Assisted Decisions
+
+AI tools were used throughout development to accelerate implementation and evaluate design alternatives.
+
+## Decision 1: Database Selection
+
+AI initially suggested PostgreSQL because it is commonly used in production analytics systems.
+
+Decision Taken:
+
+SQLite was selected instead.
+
+Reason:
+
+* Simpler reviewer setup
+* No external database dependency
+* Faster challenge deployment
+
+Trade-Off:
+
+SQLite sacrifices horizontal scalability but significantly improves ease of evaluation.
+
+---
+
+## Decision 2: Detection Architecture
+
+AI suggested exploring more advanced tracking approaches such as DeepSORT and ByteTrack.
+
+Decision Taken:
+
+A simplified YOLOv8-based detection pipeline was implemented.
+
+Reason:
+
+* Faster implementation
+* Lower complexity
+* Sufficient for challenge requirements
+
+Trade-Off:
+
+Advanced tracking could improve re-identification accuracy but would increase implementation complexity.
+
+---
+
+## Decision 3: Analytics Architecture
+
+AI suggested tightly coupling analytics calculations with ingestion logic.
+
+Decision Taken:
+
+Analytics computation was separated from ingestion.
+
+Reason:
+
+* Better maintainability
+* Cleaner architecture
+* Easier future scaling
+
+Trade-Off:
+
+Additional abstraction introduces slightly more complexity but improves long-term flexibility.
+
+---
+
+# Future Enhancements
+
+Potential future improvements include:
 
 * ByteTrack integration
 * Multi-camera visitor tracking
 * PostgreSQL migration
 * Real-time streaming analytics
-* Dashboard visualization
 * Advanced anomaly detection
 * Cloud deployment support
+* Cross-store performance comparisons
 
-## AI-Assisted Decisions
+---
 
-AI-assisted tools were used during development to accelerate implementation, generate initial code templates, assist with debugging, and improve documentation quality.
+# Conclusion
 
-### Areas Where AI Assistance Was Used
-
-* FastAPI endpoint scaffolding and routing suggestions
-* SQLAlchemy model and schema structure recommendations
-* Pytest test template generation
-* Docker and Docker Compose configuration guidance
-* Documentation drafting and formatting
-* API validation and troubleshooting support
-
-### Developer Review Process
-
-All AI-generated code and recommendations were manually reviewed, tested, and modified before being integrated into the project.
-
-The final implementation, architecture decisions, testing strategy, and project structure were validated through local execution, automated testing, Docker deployment verification, and API endpoint testing.
-
-### Benefits
-
-Using AI-assisted development improved productivity by reducing boilerplate coding effort and accelerating troubleshooting while allowing focus on system design, business logic, analytics implementation, and production-readiness requirements.
+The Store Intelligence Platform demonstrates a complete retail analytics workflow from computer vision event generation to business intelligence reporting. The modular architecture supports future enhancements while remaining lightweight, easy to deploy, and suitable for rapid evaluation.

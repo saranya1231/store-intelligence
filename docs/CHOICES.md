@@ -1,132 +1,209 @@
-# Technology Choices and Rationale
+# Technology Choices and Design Rationale
 
-## YOLOv8
-
-### Why YOLOv8 was selected
-
-YOLOv8 was chosen because:
-
-- Fast inference speed
-- High accuracy for person detection
-- Easy integration with Python
-- Lightweight models available
-- Strong community support
-
-### Benefits
-
-- Real-time processing capability
-- Suitable for CCTV analytics
-- Easy deployment in Docker environments
+This document explains key architectural and technology decisions made during development of the Store Intelligence Platform.
 
 ---
 
-## FastAPI
+# Decision 1: Detection Model
 
-### Why FastAPI was selected
+## Options Considered
 
-FastAPI was chosen because:
+1. YOLOv8
+2. YOLOv9
+3. RT-DETR
 
-- High performance
-- Automatic Swagger documentation
-- Native request validation using Pydantic
-- Simple REST API development
-- Excellent developer productivity
+## Selected Option
 
-### Benefits
+YOLOv8
 
-- Reduced development time
-- Built-in OpenAPI support
-- Strong typing support
-- Easy API testing through Swagger UI
+## Why YOLOv8
 
----
+* Mature ecosystem
+* Strong person detection performance
+* Easy Python integration
+* Lightweight deployment
+* Extensive documentation
 
-## SQLite
+## Why Other Options Were Not Selected
 
-### Why SQLite was selected
+### YOLOv9
 
-SQLite was chosen because:
+Pros:
 
-- Zero configuration database
-- Lightweight deployment
-- Ideal for prototype and challenge environments
-- No separate database server required
+* Newer architecture
 
-### Benefits
+Cons:
 
-- Easy setup
-- Portable database file
-- Fast local development
-- Minimal resource usage
+* Less mature tooling
+* Limited deployment familiarity
 
----
+### RT-DETR
 
-## Docker
+Pros:
 
-### Why Docker was selected
+* High detection quality
 
-Docker was chosen because:
+Cons:
 
-- Consistent deployment environment
-- Easy setup for reviewers
-- Dependency isolation
-- Reproducible builds
+* More complex integration
+* Higher implementation effort
 
-### Benefits
-
-- Single-command deployment
-- Platform independence
-- Simplified environment management
-- Easy scalability in the future
+Given the challenge timeline, YOLOv8 provided the best balance between accuracy, simplicity, and deployment speed.
 
 ---
 
-## Event-Driven Architecture
+# Decision 2: Event Schema Design
 
-### Why Event-Based Processing
+## Options Considered
 
-Event-driven processing was selected because:
+### Raw Detection Storage
 
-- Decouples detection and analytics
-- Supports future scalability
-- Simplifies ingestion and reporting
-- Enables batch processing
+Store every frame-level detection.
 
-### Benefits
+### Structured Event Storage
 
-- Flexible architecture
-- Easier maintenance
-- Future integration readiness
-- Better system modularity
+Store business events such as ENTRY, EXIT, ZONE_ENTER, and PURCHASE.
 
----
+## Selected Option
 
-## SQLAlchemy ORM
+Structured Event Storage
 
-### Why SQLAlchemy was selected
+## Reason
 
-SQLAlchemy was chosen because:
+Business analytics operate on visitor behavior rather than frame-level detections.
 
-- Simplifies database operations
-- Supports multiple database backends
-- Reduces raw SQL usage
-- Integrates well with FastAPI
+Structured events:
 
-### Benefits
-
-- Cleaner code
-- Easier maintenance
-- Database portability
-- Better scalability
+* Reduce storage requirements
+* Simplify analytics queries
+* Improve maintainability
+* Align directly with business KPIs
 
 ---
 
-## Future Improvements
+# Decision 3: API Architecture
 
-- PostgreSQL for production workloads
-- Redis caching layer
-- Kafka event streaming
-- Multi-camera visitor tracking
-- Advanced anomaly detection models
-- Real-time dashboard analytics
-- Cloud deployment on AWS/Azure
+## Options Considered
+
+### Monolithic Processing
+
+Detection and analytics tightly coupled.
+
+### Event-Driven Processing
+
+Detection emits events that are processed independently.
+
+## Selected Option
+
+Event-Driven Processing
+
+## Reason
+
+Benefits include:
+
+* Better modularity
+* Easier maintenance
+* Future scalability
+* Clear separation of concerns
+
+This approach also mirrors real-world retail analytics architectures.
+
+---
+
+# Decision 4: Database Selection
+
+## Options Considered
+
+### SQLite
+
+### PostgreSQL
+
+## Selected Option
+
+SQLite
+
+## Reason
+
+SQLite offers:
+
+* Zero configuration
+* Lightweight deployment
+* Fast setup
+* Simple evaluation environment
+
+## Trade-Off
+
+PostgreSQL would provide better scalability and concurrency but increases operational complexity.
+
+For challenge requirements, SQLite was the most practical choice.
+
+---
+
+# Decision 5: Framework Selection
+
+## Options Considered
+
+### FastAPI
+
+### Flask
+
+### Django REST Framework
+
+## Selected Option
+
+FastAPI
+
+## Reason
+
+FastAPI provides:
+
+* High performance
+* Automatic Swagger documentation
+* Strong validation through Pydantic
+* Type safety
+* Excellent developer productivity
+
+These features significantly reduced development effort while improving API quality.
+
+---
+
+# Decision 6: Deployment Strategy
+
+## Options Considered
+
+### Native Local Setup
+
+### Dockerized Deployment
+
+## Selected Option
+
+Docker
+
+## Reason
+
+Docker provides:
+
+* Reproducible builds
+* Environment consistency
+* Dependency isolation
+* One-command deployment
+
+This aligns directly with challenge requirements.
+
+---
+
+# AI Usage Reflection
+
+AI tools were used for:
+
+* Initial architecture brainstorming
+* API scaffolding suggestions
+* Test generation templates
+* Documentation drafting
+* Deployment troubleshooting
+
+All generated content was manually reviewed, modified, tested, and validated before inclusion in the final solution.
+
+Several AI recommendations were intentionally not adopted, including PostgreSQL deployment and advanced tracking architectures, because they increased complexity without providing proportional benefit for the challenge objectives.
+
+The final design prioritizes simplicity, maintainability, reviewer experience, and alignment with the business goals of the challenge.
