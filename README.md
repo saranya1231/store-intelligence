@@ -257,6 +257,39 @@ Returns application health status.
 
 ---
 
+## Event Log Output
+
+The project includes a sample event log file:
+
+```text
+sample_events.jsonl
+```
+
+The file follows the required JSONL format and demonstrates retail event generation from CCTV analytics.
+
+Supported event types include:
+
+* ENTRY
+* EXIT
+* ZONE_ENTER
+* ZONE_DWELL
+* BILLING_QUEUE_JOIN
+* PURCHASE
+
+Additional attributes include:
+
+* Store ID
+* Camera ID
+* Visitor ID
+* Timestamp
+* Zone ID
+* Staff Identification Flag
+* Detection Confidence Score
+
+Each line in the file represents a valid JSON event record and follows the challenge event schema requirements.
+
+---
+
 ## Testing
 
 Run all tests:
